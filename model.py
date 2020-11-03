@@ -1,8 +1,8 @@
 from mesa import Model
-from mesa.space import Grid, SingleGrid
+from mesa.space import MultiGrid, SingleGrid
 from mesa.datacollection import DataCollector
 
-from agents import Snail, Greenfly, Salad, Tomato
+from agents import Snail, Greenfly, Salad, Tomato, Fermon
 from mesa.time import RandomActivation
 
 
@@ -42,47 +42,72 @@ class Garden(Model):
         self.preparation_1 = preparation_1
         self.preparation_2 = preparation_2
         self.fermon = fermon
-        self.steps = steps,
+        self.steps = steps
         self.target = target
-
-
+        self.tomato = self.initial_tomato
+        self.salad = self.initial_salad
+        self.greenfly = self.initial_greenfly
+        self.snail = self.initial_snail
 
         self.schedule = RandomActivation(self)
 
-        self.grid = Grid(height, width, torus=True)
-        self.datacollector = DataCollector()
+        self.grid = MultiGrid(height, width, torus=True)
+
         self.datacollector = DataCollector(
             {
-                "Snail": "Snail",
-                "Greenfly": "Greenfly",
-                "Salad": "Salad",
-                "Tomato": "Tomato"
+                "Snail": "snail",
+                "Greenfly": "greenfly",
+                "Salad": "salad",
+                "Tomato": "tomato"
             }
         )
 
         # Create tomato:
         for i in range(self.initial_tomato):
-            x = self.random.randrange(self.width)
-            y = self.random.randrange(self.height)
+            empty = self.grid.find_empty()
+            if empty:
+                tomato = Tomato(self.next_id(), empty, self)
+                self.grid.place_agent(tomato, empty)
+                self.schedule.add(tomato)
 
-            tomato = Tomato(self.next_id(), (x, y), self)
-            self.grid.place_agent(tomato, (x, y))
-            self.schedule.add(tomato)
+                for neighbor in self.grid.get_neighborhood(tomato.pos, True):
+                    fermon = Fermon(self.next_id(),neighbor, self, type="Tomato")
+                    self.grid.place_agent(fermon, neighbor)
 
         # Create salad:
         for i in range(self.initial_salad):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
-
-            salad = Salad(self.next_id(), (x, y), self)
-            self.grid.place_agent(salad, (x, y))
-            self.schedule.add(salad)
+            this_cell = self.grid.get_cell_list_contents([(x,y)])
+            tomato = [obj for obj in this_cell if isinstance(obj, Tomato)]
+            if len(tomato)==0:
+                empty = (x,y)
+                salad = Salad(self.next_id(), empty, self)
+                self.grid.place_agent(salad, empty)
+                self.schedule.add(salad)
+                for neighbor in self.grid.get_neighborhood(salad.pos, True):
+                    fermon = Fermon(self.next_id(),neighbor, self, type="Salad")
+                    self.grid.place_agent(fermon, neighbor)
+            else:
+                counter = 0
+                while len(tomato)!=0 or counter==100:
+                    x = self.random.randrange(self.width)
+                    y = self.random.randrange(self.height)
+                    this_cell = self.grid.get_cell_list_contents([(x, y)])
+                    tomato = [obj for obj in this_cell if isinstance(obj, Tomato)]
+                    counter+=1
+                empty = (x, y)
+                salad = Salad(self.next_id(), empty, self)
+                self.grid.place_agent(salad, empty)
+                self.schedule.add(salad)
+                for neighbor in self.grid.get_neighborhood(salad.pos, True):
+                    fermon = Fermon(self.next_id(), neighbor, self, type="Salad")
+                    self.grid.place_agent(fermon, neighbor)
 
         # Create snail
         for i in range(self.initial_snail):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
-
             snail = Snail(self.next_id(), (x, y), self)
             self.grid.place_agent(snail, (x, y))
             self.schedule.add(snail)

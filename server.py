@@ -15,25 +15,34 @@ def garden_portrayal(agent):
     portrayal = {}
 
     if type(agent) is Greenfly:
-        portrayal["Shape"] = "rect"
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.5
         portrayal["Layer"] = 0
+        portrayal["Filled"]="true"
+        portrayal["Color"] = ["#00AA00", "#00AA00"]
+
 
 
     elif type(agent) is Snail:
-        portrayal["Shape"] = "rect"
-        portrayal["Layer"] = 1
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.5
+        portrayal["Layer"] = 0
+        portrayal["Filled"]="true"
+        portrayal["Color"] = ["#880000", "#880000"]
 
 
     elif type(agent) is Salad:
-        portrayal["Shape"] = "rect"
-        portrayal["Layer"] = 2
-
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.5
+        portrayal["Layer"] = 0
+        portrayal["Filled"]="true"
+        portrayal["Color"] = ["#003330", "#003330"]
 
     elif type(agent) is Tomato:
-        portrayal["Shape"] = "rect"
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.5
         portrayal["Layer"] = 3
-
-
+        portrayal["Color"] = ["#330000", "#330000"]
 
     return portrayal
 
@@ -44,7 +53,8 @@ chart = ChartModule(
 )
 
 model_params = {
-
+    "height": 20,
+    "width": 20,
 
     "initial_tomato": UserSettableParameter(
         "slider", "Initial Tomato Population", 100, 10, 300

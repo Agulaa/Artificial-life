@@ -1,5 +1,5 @@
 from mesa import Model
-from mesa.space import Grid
+from mesa.space import Grid, SingleGrid
 from mesa.datacollection import DataCollector
 
 from agents import Snail, Greenfly, Salad, Tomato
@@ -11,7 +11,7 @@ class Garden(Model):
 
 
 
-    verbose = False  # Print-monitoring
+    #verbose = False  # Print-monitoring
 
 
 
@@ -48,13 +48,15 @@ class Garden(Model):
 
 
         self.schedule = RandomActivation(self)
+
         self.grid = Grid(height, width, torus=True)
+        self.datacollector = DataCollector()
         self.datacollector = DataCollector(
             {
-                "Snail": lambda m: m,
-                "Greenfly": lambda m:  m,
-                "Salad": lambda m: m,
-                "Tomato": lambda m: m
+                "Snail": "Snail",
+                "Greenfly": "Greenfly",
+                "Salad": "Salad",
+                "Tomato": "Tomato"
             }
         )
 
@@ -67,7 +69,7 @@ class Garden(Model):
             self.grid.place_agent(tomato, (x, y))
             self.schedule.add(tomato)
 
-        # Create tomato:
+        # Create salad:
         for i in range(self.initial_salad):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
@@ -91,6 +93,7 @@ class Garden(Model):
             y = self.random.randrange(self.height)
 
             greenfly = Greenfly(self.next_id(), (x, y), self)
+
             self.grid.place_agent(greenfly, (x, y))
             self.schedule.add(greenfly)
 
@@ -106,11 +109,3 @@ class Garden(Model):
 
 
 
-
-    @staticmethod
-    def count_type(model, tree_condition):
-        count = 0
-        for tree in model.schedule.agents:
-            if tree.condition == tree_condition:
-                count += 1
-        return count

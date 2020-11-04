@@ -8,20 +8,13 @@ from model import Garden
 
 COLORS = {"Greenfly": "#00AA00", "Snail": "#880000", "Salad": "#003330","Tomato": "#330000" }
 
-
-
 class VegetablesElement(TextElement):
-    """
-    Display a text count of how many happy agents there are.
-    """
 
     def __init__(self):
         pass
 
     def render(self, model):
         return "Tomatoes: " + str(model.tomato) +"\n  Salads: " + str(model.salad)
-
-
 
 
 def garden_portrayal(agent):
@@ -47,8 +40,7 @@ def garden_portrayal(agent):
         #https://www.flaticon.com/svg/static/icons/svg/1155/1155281.svg
         portrayal["scale"] = 0.8
         portrayal["Layer"] = 2
-        #portrayal["Filled"]="true"
-        #portrayal["Color"] = ["#003330", "#003330"]
+
 
     elif type(agent) is Tomato:
         portrayal["Shape"] = "images/tomato.svg"
@@ -61,7 +53,7 @@ def garden_portrayal(agent):
         portrayal["r"] = 0.1
         portrayal["Layer"] = 5
         if agent.type =="Tomato":
-            portrayal["Color"] =["#330000", '#330000']
+            portrayal["Color"] = ["#330000", '#330000']
         else:
             portrayal["Color"] = ["#013300", '#013300']
 
@@ -81,16 +73,22 @@ model_params = {
     "width": 20,
 
     "initial_tomato": UserSettableParameter(
-        "slider", "Initial Tomato Population", 100, 10, 300
+        "slider", "Initial Tomato Population", 1, 1, 50
     ),
     "initial_salad": UserSettableParameter(
-        "slider", "Initial Salad Population", 100, 10, 300
+        "slider", "Initial Salad Population", 1, 1, 50
     ),
     "initial_snail": UserSettableParameter(
-        "slider", "Initial Snail Population", 100, 10, 300
+        "slider", "Initial Snail Population", 0, 0, 50
+    ),
+    "step_without_eat_snail": UserSettableParameter(
+        "slider", "Steps without eat for Snail",1, 1, 50
     ),
     "initial_greenfly": UserSettableParameter(
-        "slider", "Initial Greenfly Population", 100, 10, 300
+        "slider", "Initial Greenfly Population", 0, 0, 50
+    ),
+    "step_without_eat_greenfly": UserSettableParameter(
+        "slider", "Steps without eat for Greenfly", 1, 1, 50
     ),
     "preparation_1": UserSettableParameter(
         "slider", "Preparation_1", 20, 1, 50
@@ -98,8 +96,8 @@ model_params = {
     "preparation_2": UserSettableParameter(
         "slider", "Preparation_2", 20, 1, 50
     ),
-    "fermon": UserSettableParameter(
-        "slider", "Fermon", 1, 1, 20
+    "cell_fermon": UserSettableParameter(
+        "slider", "Fermon", 1, 1, 10
     ),
     "steps": UserSettableParameter(
         "slider", "Steps", 20, 1, 50

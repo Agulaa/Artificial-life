@@ -9,25 +9,21 @@ from mesa.time import RandomActivation
 class Garden(Model):
 
 
-
-
-    #verbose = False  # Print-monitoring
-
-
-
     def __init__(
         self,
         height=20,
         width=20,
-        initial_tomato=100,
-        initial_salad=100,
-        initial_snail=50,
-        initial_greenfly=50,
-        preparation_1 = 50,
-        preparation_2=30,
-        fermon = 4,
+        initial_tomato=20,
+        initial_salad=20,
+        initial_snail=10,
+        initial_greenfly=10,
+        preparation_1 = 20,
+        preparation_2=20,
+        cell_fermon = 1,
         steps = 5,
-        target=40
+        target=40,
+        step_without_eat_snail = 10,
+        step_without_eat_greenfly=10
 
     ):
 
@@ -41,17 +37,19 @@ class Garden(Model):
         self.initial_greenfly = initial_greenfly
         self.preparation_1 = preparation_1
         self.preparation_2 = preparation_2
-        self.fermon = fermon
+        self.cell_fermon = cell_fermon
         self.steps = steps
         self.target = target
         self.tomato = self.initial_tomato
         self.salad = self.initial_salad
         self.greenfly = self.initial_greenfly
         self.snail = self.initial_snail
+        self.step_without_eat_snail = step_without_eat_snail
+        self.step_without_eat_greenfly = step_without_eat_greenfly
 
         self.schedule = RandomActivation(self)
 
-        self.grid = MultiGrid(height, width, torus=True)
+        self.grid = MultiGrid(height, width, torus=False)
 
         self.datacollector = DataCollector(
             {
@@ -64,15 +62,20 @@ class Garden(Model):
 
         # Create tomato:
         for i in range(self.initial_tomato):
-            empty = self.grid.find_empty()
-            if empty:
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            this_cell = self.grid.get_cell_list_contents([(x, y)])
+            tomato = [obj for obj in this_cell if isinstance(obj, Tomato)]
+            if len(tomato) == 0:
+                empty = (x, y)
                 tomato = Tomato(self.next_id(), empty, self)
                 self.grid.place_agent(tomato, empty)
                 self.schedule.add(tomato)
+                self.put_fermon(tomato, "Tomato")
 
-                for neighbor in self.grid.get_neighborhood(tomato.pos, True):
-                    fermon = Fermon(self.next_id(),neighbor, self, type="Tomato")
-                    self.grid.place_agent(fermon, neighbor)
+
+
+
 
         # Create salad:
         for i in range(self.initial_salad):
@@ -85,9 +88,7 @@ class Garden(Model):
                 salad = Salad(self.next_id(), empty, self)
                 self.grid.place_agent(salad, empty)
                 self.schedule.add(salad)
-                for neighbor in self.grid.get_neighborhood(salad.pos, True):
-                    fermon = Fermon(self.next_id(),neighbor, self, type="Salad")
-                    self.grid.place_agent(fermon, neighbor)
+                self.put_fermon(salad, "Salad")
             else:
                 counter = 0
                 while len(tomato)!=0 or counter==100:
@@ -100,9 +101,7 @@ class Garden(Model):
                 salad = Salad(self.next_id(), empty, self)
                 self.grid.place_agent(salad, empty)
                 self.schedule.add(salad)
-                for neighbor in self.grid.get_neighborhood(salad.pos, True):
-                    fermon = Fermon(self.next_id(), neighbor, self, type="Salad")
-                    self.grid.place_agent(fermon, neighbor)
+                self.put_fermon(salad, "Salad")
 
         # Create snail
         for i in range(self.initial_snail):
@@ -133,4 +132,47 @@ class Garden(Model):
         self.datacollector.collect(self)
 
 
-
+    def put_fermon(self, position, type):
+        for i in range(0, self.cell_fermon + 1):
+            x = position.pos[0]
+            y = position.pos[1]
+            if x + i < self.width and y + i < self.height:
+                new_fermon_cell = (x + i, y + i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x - i >= 0 and y + i < self.height:
+                new_fermon_cell = (x - i, y + i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x - i >= 0 and y - i >= 0:
+                new_fermon_cell = (x - i, y - i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x + i < self.width and y - i >= 0:
+                new_fermon_cell = (x + i, y - i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x+(i-1)<self.width and y - i >= 0:
+                new_fermon_cell = (x, y - i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x  and y + i <  self.height:
+                new_fermon_cell = (x, y + i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x and y - i >= 0:
+                new_fermon_cell = (x, y - i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x and y + i <  self.height:
+                new_fermon_cell = (x, y + i)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x + i < self.width and y:
+                new_fermon_cell = (x + i, y)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)
+            if x - i >= 0 and y:
+                new_fermon_cell = (x - i, y)
+                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+                self.grid.place_agent(new_fermon, new_fermon_cell)

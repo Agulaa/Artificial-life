@@ -2,7 +2,7 @@ from mesa import Model
 from mesa.space import MultiGrid, SingleGrid
 from mesa.datacollection import DataCollector
 
-from agents import Snail, Greenfly, Salad, Tomato, Fermon
+from agents import Snail, Greenfly, Salad, Tomato, Fermon, Farmer
 from mesa.time import RandomActivation
 
 
@@ -17,13 +17,16 @@ class Garden(Model):
         initial_salad=20,
         initial_snail=10,
         initial_greenfly=10,
-        preparation_1 = 20,
-        preparation_2=20,
+        preparation_1 = 10,
+        preparation_2=10,
         cell_fermon = 1,
         steps = 5,
-        target=40,
+        target_tomato=20,
+        target_salad=20,
         step_without_eat_snail = 10,
-        step_without_eat_greenfly=10
+        step_without_eat_greenfly=10,
+        reproduction_snail = 10,
+        reproduction_greenfly = 10
 
     ):
 
@@ -39,13 +42,16 @@ class Garden(Model):
         self.preparation_2 = preparation_2
         self.cell_fermon = cell_fermon
         self.steps = steps
-        self.target = target
+        self.target_tomato = target_tomato
+        self.target_salad = target_salad
         self.tomato = self.initial_tomato
         self.salad = self.initial_salad
         self.greenfly = self.initial_greenfly
         self.snail = self.initial_snail
         self.step_without_eat_snail = step_without_eat_snail
         self.step_without_eat_greenfly = step_without_eat_greenfly
+        self.reproduction_snail = reproduction_snail
+        self.reproduction_greenfly = reproduction_greenfly
 
         self.schedule = RandomActivation(self)
 
@@ -59,6 +65,10 @@ class Garden(Model):
                 "Tomato": "tomato"
             }
         )
+
+        #Create farmer:
+        farmer = Farmer(self.next_id(), self)
+        self.schedule.add(farmer)
 
         # Create tomato:
         for i in range(self.initial_tomato):

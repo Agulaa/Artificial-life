@@ -90,11 +90,17 @@ model_params = {
     "step_without_eat_greenfly": UserSettableParameter(
         "slider", "Steps without eat for Greenfly", 1, 1, 50
     ),
+    "reproduction_snail": UserSettableParameter(
+        "slider", "Reproduction steps for Snail",1, 1, 50
+    ),
+    "reproduction_greenfly": UserSettableParameter(
+        "slider", "Reproduction steps for Greenfly",1, 1, 50
+    ),
     "preparation_1": UserSettableParameter(
-        "slider", "Preparation_1", 20, 1, 50
+        "slider", "Preparation_1", 10, 0, 20
     ),
     "preparation_2": UserSettableParameter(
-        "slider", "Preparation_2", 20, 1, 50
+        "slider", "Preparation_2", 10, 0, 20
     ),
     "cell_fermon": UserSettableParameter(
         "slider", "Fermon", 1, 1, 10
@@ -102,9 +108,12 @@ model_params = {
     "steps": UserSettableParameter(
         "slider", "Steps", 20, 1, 50
     ),
-    "target": UserSettableParameter(
-        "slider", "Target", 20, 1, 50
-    )
+    "target_tomato": UserSettableParameter(
+        "slider", "Target Tomato", 20, 1, 50
+    ),
+    "target_salad": UserSettableParameter(
+            "slider", "Target Salad", 20, 1, 50
+        )
 
 }
 server = ModularServer(

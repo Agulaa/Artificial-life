@@ -1,6 +1,6 @@
 from mesa import Agent
 import numpy as np
-
+import random
 
 
 class WalkerAgent(Agent):
@@ -132,6 +132,7 @@ class Snail(WalkerAgent):
     def __init__(self, unique_id, pos, model, moore=True):
         super().__init__(unique_id, pos, model, moore)
         self.step_without_eat = self.model.step_without_eat_snail
+        self.reproduction_snail = self.model.reproduction_snail
 
 
     def step(self):
@@ -183,13 +184,23 @@ class Snail(WalkerAgent):
                 change_pos = True
             if not change_pos:
                 self.random_move()
-        # Reproduction
 
         #Death
         else:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             self.model.snail-=1
+
+        # Reproduction - wiem że powinno to być wyżej bo tu już ten owad może nie żyć ale z jakegoś powodu to nie działało, będę próbować
+        self.reproduction_snail -= 1
+        if self.reproduction_snail == 0 and random.uniform(0, 1) < 0.3:
+            snail = Snail(self.model.next_id(), self.pos, self.model)
+            self.model.grid.place_agent(snail, self.pos)
+            self.model.schedule.add(snail)
+
+        if self.reproduction_snail == 0:
+            self.reproduction_snail = self.model.reproduction_snail
+
 
 
 
@@ -198,6 +209,7 @@ class Greenfly(WalkerAgent):
     def __init__(self, unique_id, pos, model, moore=False):
         super().__init__(unique_id, pos, model, moore=moore)
         self.step_without_eat = self.model.step_without_eat_greenfly
+        self.reproduction_greenfly = self.model.reproduction_greenfly
 
     def step(self):
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
@@ -238,13 +250,42 @@ class Greenfly(WalkerAgent):
                 change_pos = True
             if not change_pos:
                 self.random_move()
-        #Reproduction
 
         #Death
         else:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             self.model.greenfly-=1
+
+        # Reproduction - wiem że powinno to być wyżej bo tu już ten owad może nie żyć ale z jakegoś powodu to nie działało, będę próbować
+        self.reproduction_greenfly -= 1
+        if self.reproduction_greenfly == 0 and random.uniform(0, 1) < 0.3:
+            greenfly = Greenfly(self.model.next_id(), self.pos, self.model)
+            self.model.grid.place_agent(greenfly, self.pos)
+            self.model.schedule.add(greenfly)
+
+        if self.reproduction_greenfly == 0:
+            self.reproduction_greenfly = self.model.reproduction_greenfly
+
+
+class Farmer(Agent):
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
+        self.dose_preparation_1 = self.model.preparation_1
+        self.dose_preparation_2 = self.model.preparation_2
+        self.use_preparation_1 = False
+        self.use_preparation_2 = False
+
+    def make_decision(self):
+
+        if (self.model.tomato < self.model.target_tomato or self.model.salad < self.model.target_salad):
+
+            
+
+            return 0
+
+
+        return 0
 
 
 

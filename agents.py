@@ -169,15 +169,23 @@ class Snail(WalkerAgent):
 
         # Kolejny krok wykonywany jest tam gdzie jest pomidor lub fermon lub losowo wybrany ruch
         if self.step_without_eat >= 1:
-            #sprawdzamy po sąsiadach czy jest fermon lub pomidor
+            #sprawdzamy po sąsiadach czy jest fermon, sałata lub pomidor
             for neighbor in self.model.grid.get_neighborhood(self.pos, True):
                 cell = self.model.grid.get_cell_list_contents([neighbor])
+                salad = [obj for obj in cell if isinstance(obj, Salad)]
                 tomato = [obj for obj in cell if isinstance(obj, Tomato)]
-                fermon = [obj for obj in cell if isinstance(obj, Fermon)]
-                if len(tomato)>=1:
+                salad_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == "Salad"]
+                tomato_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type=="Tomato"]
+                # ślimak w pierwszej kolejności wybiera sałatę
+                if len(salad)>=1:
                     self.model.grid.move_agent(self, neighbor)
                     change_pos = True
-                elif len(fermon)>=1:
+                elif len(tomato)>=1:
+                    self.model.grid.move_agent(self, neighbor)
+                    change_pos = True
+                elif len(salad_fermon)>=1:
+                    remember_pos = neighbor
+                elif len(tomato_fermon)>=1:
                     remember_pos = neighbor
             if remember_pos and not change_pos:
                 self.model.grid.move_agent(self, remember_pos)
@@ -216,7 +224,7 @@ class Greenfly(WalkerAgent):
         tomato = [obj for obj in this_cell if isinstance(obj, Tomato)]
 
         if len(tomato) > 0:
-            #jeśli jest sałata to mszyca się najada
+            #jeśli jest pomidor to mszyca się najada
             self.step_without_eat = self.model.step_without_eat_greenfly
             #Jeśli pomidor jest osłabiony to jak zaatakuje go jedna mszyca to umiera
             if tomato[0].is_weak:

@@ -84,9 +84,6 @@ class Garden(Model):
                 self.put_all_fermon(tomato, "Tomato")
 
 
-
-
-
         # Create salad:
         for i in range(self.initial_salad):
             x = self.random.randrange(self.width)

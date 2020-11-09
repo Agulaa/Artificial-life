@@ -26,7 +26,6 @@ class WalkerAgent(Agent):
                 next_y = self.random.choice(canditate_y)
             self.model.grid.move_agent(self, (next_x, next_y))
 
-
 class FermonAgent(Agent):
     def __init__(self, unique_id, pos, model):
         super().__init__(unique_id, model)
@@ -72,7 +71,6 @@ class FermonAgent(Agent):
 
         self.model.grid._remove_agent(self.pos, self)
 
-
 class Tomato(FermonAgent):
 
     def __init__(self, unique_id, pos, model):
@@ -89,7 +87,6 @@ class Salad(FermonAgent):
         self.pos = pos
         self.eaten_by_snail = 4
         self.is_weak = False
-
 
 class Fermon(Agent):
 
@@ -110,10 +107,12 @@ class Snail(WalkerAgent):
 
 
     def step(self):
+
+        #Najpierw sprawdzamy co jest w komórce, w której znajduje się ślimak
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         salad = [obj for obj in this_cell if isinstance(obj, Salad)]
         tomato = [obj for obj in this_cell if isinstance(obj, Tomato)]
-
+        #Jeśli sałata to się pożywia
         if len(salad) > 0:
             #Jeśli sałata była na polu, to ślimak się najadł
             self.step_without_eat = self.model.step_without_eat_snail
@@ -127,7 +126,7 @@ class Snail(WalkerAgent):
                 if salad[0].eaten_by_snail<=0:
                     salad[0].death("Salad")
                     self.model.salad -= 1
-
+        #jeśli pomidor to też się pożywia
         if len(tomato) > 0:
             #Ślimak najada się listkami pomidorów i jedynie osłaba pomidory
             self.step_without_eat = self.model.step_without_eat_snail
@@ -138,9 +137,8 @@ class Snail(WalkerAgent):
             self.step_without_eat-=1
 
 
+        # jeśli ślimak jest najedzony to wykonuje kolejny krok
         change_pos = False
-        remember_pos = None
-
         # Kolejny krok wykonywany jest tam gdzie jest pomidor lub fermon lub losowo wybrany ruch
         if self.step_without_eat >= 1:
             #sprawdzamy po sąsiadach czy jest fermon, sałata lub pomidor
@@ -158,16 +156,16 @@ class Snail(WalkerAgent):
                     self.model.grid.move_agent(self, neighbor)
                     change_pos = True
                 elif len(salad_fermon)>=1:
-                    remember_pos = neighbor
+                    self.model.grid.move_agent(self, neighbor)
+                    change_pos = True
                 elif len(tomato_fermon)>=1:
-                    remember_pos = neighbor
-            if remember_pos and not change_pos:
-                self.model.grid.move_agent(self, remember_pos)
-                change_pos = True
+                    self.model.grid.move_agent(self, neighbor)
+                    change_pos = True
+
             if not change_pos:
                 self.random_move()
 
-        #Death
+        #Death - jeśli ślimak nie pożywił się to umiera
         else:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
@@ -194,17 +192,18 @@ class Greenfly(WalkerAgent):
         self.reproduction_greenfly = self.model.reproduction_greenfly
 
     def step(self):
+
+        #Sprawdzanie co jest na podanej komóre, na której jest mszyca - jeśli jest pomidor - to się posila
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         tomato = [obj for obj in this_cell if isinstance(obj, Tomato)]
-
         if len(tomato) > 0:
             #jeśli jest pomidor to mszyca się najada
             self.step_without_eat = self.model.step_without_eat_greenfly
-            #Jeśli pomidor jest osłabiony to jak zaatakuje go jedna mszyca to umiera
+            #Jeśli pomidor jest osłabiony to jak zaatakuje go jedna mszyca to pomidor umiera
             if tomato[0].is_weak:
                 tomato[0].death("Tomato")
                 self.model.tomato-=1
-            #Jeśli pomidor nie był osłabiony, to muszą go zaatakować 5 mszyc
+            #Jeśli pomidor nie był osłabiony, to muszą go zaatakować 5 mszyc, więc inkrementujemy wartość dla pomidora
             else:
                 tomato[0].eaten_by_greenfly-=1
                 if tomato[0].eaten_by_greenfly<=0:
@@ -214,8 +213,8 @@ class Greenfly(WalkerAgent):
             #jeśli nie było pomidorów to dekremenyujemy zmienną step_without_eat
             self.step_without_eat -= 1
 
+        # Zmiana swojej pozycji, jeśli mszyca jest w stanie dalej żyć - tzn jest najedzona
         change_pos = False
-        remeber_pos = None
         # Kolejny krok jest zależy od tego, czy w sąsiedztwie jest fermon pomidora lub sam pomidor
         if self.step_without_eat>=1:
             for neighbor in self.model.grid.get_neighborhood(self.pos, True):
@@ -226,14 +225,12 @@ class Greenfly(WalkerAgent):
                     self.model.grid.move_agent(self, neighbor)
                     change_pos = True
                 elif len(fermon) >= 1:
-                    remeber_pos = neighbor
-            if remeber_pos and not change_pos:
-                self.model.grid.move_agent(self, remeber_pos)
-                change_pos = True
+                    self.model.grid.move_agent(self, neighbor)
+                    change_pos = True
             if not change_pos:
                 self.random_move()
 
-        #Death
+        #Death - jeśli mszyca nie jest najedzona - umiera
         else:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
@@ -262,7 +259,6 @@ class Farmer(Agent):
 
         if (self.model.tomato < self.model.target_tomato or self.model.salad < self.model.target_salad):
 
-            
 
             return 0
 

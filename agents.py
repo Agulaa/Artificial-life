@@ -139,6 +139,7 @@ class Snail(WalkerAgent):
 
         # jeśli ślimak jest najedzony to wykonuje kolejny krok
         change_pos = False
+        remember_pos = None
         # Kolejny krok wykonywany jest tam gdzie jest pomidor lub fermon lub losowo wybrany ruch
         if self.step_without_eat >= 1:
             #sprawdzamy po sąsiadach czy jest fermon, sałata lub pomidor
@@ -156,12 +157,13 @@ class Snail(WalkerAgent):
                     self.model.grid.move_agent(self, neighbor)
                     change_pos = True
                 elif len(salad_fermon)>=1:
-                    self.model.grid.move_agent(self, neighbor)
-                    change_pos = True
+                    remember_pos = neighbor
                 elif len(tomato_fermon)>=1:
-                    self.model.grid.move_agent(self, neighbor)
-                    change_pos = True
+                    remember_pos = neighbor
 
+            if not change_pos and remember_pos:
+                self.model.grid.move_agent(self, remember_pos)
+                change_pos = True
             if not change_pos:
                 self.random_move()
 
@@ -215,6 +217,7 @@ class Greenfly(WalkerAgent):
 
         # Zmiana swojej pozycji, jeśli mszyca jest w stanie dalej żyć - tzn jest najedzona
         change_pos = False
+        remember_pos = None
         # Kolejny krok jest zależy od tego, czy w sąsiedztwie jest fermon pomidora lub sam pomidor
         if self.step_without_eat>=1:
             for neighbor in self.model.grid.get_neighborhood(self.pos, True):
@@ -225,8 +228,13 @@ class Greenfly(WalkerAgent):
                     self.model.grid.move_agent(self, neighbor)
                     change_pos = True
                 elif len(fermon) >= 1:
-                    self.model.grid.move_agent(self, neighbor)
-                    change_pos = True
+                    remember_pos = neighbor
+                    #self.model.grid.move_agent(self, neighbor)
+                    #change_pos = True
+            if not change_pos and remember_pos:
+                self.model.grid.move_agent(self, remember_pos)
+                change_pos = True
+
             if not change_pos:
                 self.random_move()
 

@@ -91,10 +91,10 @@ model_params = {
         "slider", "Steps without eat for Greenfly", 1, 1, 50
     ),
     "reproduction_snail": UserSettableParameter(
-        "slider", "Reproduction steps for Snail",1, 1, 50
+        "slider", "Reproduction steps for Snail",0, 0, 50
     ),
     "reproduction_greenfly": UserSettableParameter(
-        "slider", "Reproduction steps for Greenfly",1, 1, 50
+        "slider", "Reproduction steps for Greenfly",0, 0, 50
     ),
     "preparation_1": UserSettableParameter(
         "slider", "Preparation_1", 10, 0, 20

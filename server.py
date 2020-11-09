@@ -14,7 +14,8 @@ class VegetablesElement(TextElement):
         pass
 
     def render(self, model):
-        return "Tomatoes: " + str(model.tomato) +"\n  Salads: " + str(model.salad)
+
+        return "Tomatoes: " + str(model.tomato) +"  Salads: " + str(model.salad) + "  Snail: " + str(model.snail) + "  Greenfly: "+ str(model.greenfly)
 
 
 def garden_portrayal(agent):
@@ -64,10 +65,7 @@ def garden_portrayal(agent):
 
 vegetables_element = VegetablesElement()
 canvas_element = CanvasGrid(garden_portrayal, 20, 20, 500, 500)
-chart = ChartModule(
-    [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
-)
-
+chart = ChartModule([{"Label": "Greenfly", "Color": "Black"}, {"Label": "Snail", "Color": "Brown"}, {"Label": "Salad", "Color": "Green"}, {"Label": "Tomato", "Color": "Red"}])
 model_params = {
     "height": 20,
     "width": 20,

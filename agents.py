@@ -70,6 +70,7 @@ class FermonAgent(Agent):
                 self.death_fermom_in_cell(new_fermon_cell, type)
 
         self.model.grid._remove_agent(self.pos, self)
+        self.model.schedule.remove(self)
 
 class Tomato(FermonAgent):
 
@@ -173,12 +174,14 @@ class Snail(WalkerAgent):
             self.model.schedule.remove(self)
             self.model.snail-=1
 
+
         # Reproduction - wiem że powinno to być wyżej bo tu już ten owad może nie żyć ale z jakegoś powodu to nie działało, będę próbować
         self.reproduction_snail -= 1
         if self.reproduction_snail == 0 and random.uniform(0, 1) < 0.3:
             snail = Snail(self.model.next_id(), self.pos, self.model)
             self.model.grid.place_agent(snail, self.pos)
             self.model.schedule.add(snail)
+            self.model.snail+=1
 
         if self.reproduction_snail == 0:
             self.reproduction_snail = self.model.reproduction_snail
@@ -242,14 +245,17 @@ class Greenfly(WalkerAgent):
         else:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
-            self.model.greenfly-=1
+            self.model.greenfly -= 1
+
 
         # Reproduction - wiem że powinno to być wyżej bo tu już ten owad może nie żyć ale z jakegoś powodu to nie działało, będę próbować
         self.reproduction_greenfly -= 1
         if self.reproduction_greenfly == 0 and random.uniform(0, 1) < 0.3:
             greenfly = Greenfly(self.model.next_id(), self.pos, self.model)
+
             self.model.grid.place_agent(greenfly, self.pos)
             self.model.schedule.add(greenfly)
+            self.model.greenfly += 1
 
         if self.reproduction_greenfly == 0:
             self.reproduction_greenfly = self.model.reproduction_greenfly

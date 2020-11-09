@@ -32,71 +32,43 @@ class FermonAgent(Agent):
         super().__init__(unique_id, model)
         self.pos = pos
 
+    def death_fermom_in_cell(self, new_fermon_cell, type):
+        cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
+        fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
+        for f in fermon:
+            self.model.grid._remove_agent(new_fermon_cell, f)
+
     def death(self, type):
         x = self.pos[0]
         y = self.pos[1]
-        for i in range(1, self.model.cell_fermon + 1):
+        for i in range(0, self.model.cell_fermon + 1):
             if x + i < self.model.width and y + i < self.model.height:
                 new_fermon_cell = (x + i, y + i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
-
+                self.death_fermom_in_cell(new_fermon_cell, type)
             if x - i >= 0 and y + i < self.model.height:
                 new_fermon_cell = (x - i, y + i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
+                self.death_fermom_in_cell(new_fermon_cell, type)
             if x - i >= 0 and y - i >= 0:
                 new_fermon_cell = (x - i, y - i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
+                self.death_fermom_in_cell(new_fermon_cell, type)
             if x + i < self.model.width and y - i >= 0:
                 new_fermon_cell = (x + i, y - i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
-            if x and y - i >= 0:
+                self.death_fermom_in_cell(new_fermon_cell, type)
+            if x + (i - 1) < self.model.width and y - i >= 0:
                 new_fermon_cell = (x, y - i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
+                self.death_fermom_in_cell(new_fermon_cell, type)
             if x and y + i < self.model.height:
                 new_fermon_cell = (x, y + i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
+                self.death_fermom_in_cell(new_fermon_cell, type)
             if x and y - i >= 0:
                 new_fermon_cell = (x, y - i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
-            if x and y + i < self.model.height:
-                new_fermon_cell = (x, y + i)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
+                self.death_fermom_in_cell(new_fermon_cell, type)
             if x + i < self.model.width and y:
                 new_fermon_cell = (x + i, y)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
+                self.death_fermom_in_cell(new_fermon_cell, type)
             if x - i >= 0 and y:
                 new_fermon_cell = (x - i, y)
-                cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
-                fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
-                for f in fermon:
-                    self.model.grid._remove_agent(new_fermon_cell, f)
+                self.death_fermom_in_cell(new_fermon_cell, type)
 
         self.model.grid._remove_agent(self.pos, self)
 
@@ -121,7 +93,7 @@ class Salad(FermonAgent):
 
 class Fermon(Agent):
 
-    def __init__(self, unique_id, pos, model, type="Salad"):
+    def __init__(self, unique_id, pos, model, type):
         super().__init__(unique_id, model)
         self.pos = pos
         self.type = type
@@ -133,6 +105,8 @@ class Snail(WalkerAgent):
         super().__init__(unique_id, pos, model, moore)
         self.step_without_eat = self.model.step_without_eat_snail
         self.reproduction_snail = self.model.reproduction_snail
+
+
 
 
     def step(self):

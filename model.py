@@ -81,7 +81,7 @@ class Garden(Model):
                 tomato = Tomato(self.next_id(), empty, self)
                 self.grid.place_agent(tomato, empty)
                 self.schedule.add(tomato)
-                self.put_fermon(tomato, "Tomato")
+                self.put_all_fermon(tomato, "Tomato")
 
 
 
@@ -98,7 +98,7 @@ class Garden(Model):
                 salad = Salad(self.next_id(), empty, self)
                 self.grid.place_agent(salad, empty)
                 self.schedule.add(salad)
-                self.put_fermon(salad, "Salad")
+                self.put_all_fermon(salad, "Salad")
             else:
                 counter = 0
                 while len(tomato)!=0 or counter==100:
@@ -111,7 +111,7 @@ class Garden(Model):
                 salad = Salad(self.next_id(), empty, self)
                 self.grid.place_agent(salad, empty)
                 self.schedule.add(salad)
-                self.put_fermon(salad, "Salad")
+                self.put_all_fermon(salad, "Salad")
 
         # Create snail
         for i in range(self.initial_snail):
@@ -141,48 +141,39 @@ class Garden(Model):
         # collect data
         self.datacollector.collect(self)
 
+    def put_fermon(self, new_fermon_cell, type):
+        new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+        self.grid.place_agent(new_fermon, new_fermon_cell)
 
-    def put_fermon(self, position, type):
+
+    def put_all_fermon(self, position, type):
         for i in range(0, self.cell_fermon + 1):
             x = position.pos[0]
             y = position.pos[1]
             if x + i < self.width and y + i < self.height:
                 new_fermon_cell = (x + i, y + i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x - i >= 0 and y + i < self.height:
                 new_fermon_cell = (x - i, y + i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x - i >= 0 and y - i >= 0:
                 new_fermon_cell = (x - i, y - i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x + i < self.width and y - i >= 0:
                 new_fermon_cell = (x + i, y - i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x+(i-1)<self.width and y - i >= 0:
                 new_fermon_cell = (x, y - i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x  and y + i <  self.height:
                 new_fermon_cell = (x, y + i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x and y - i >= 0:
                 new_fermon_cell = (x, y - i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
-            if x and y + i <  self.height:
-                new_fermon_cell = (x, y + i)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x + i < self.width and y:
                 new_fermon_cell = (x + i, y)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)
             if x - i >= 0 and y:
                 new_fermon_cell = (x - i, y)
-                new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
-                self.grid.place_agent(new_fermon, new_fermon_cell)
+                self.put_fermon(new_fermon_cell, type)

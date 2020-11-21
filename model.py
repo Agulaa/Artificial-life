@@ -52,6 +52,9 @@ class Garden(Model):
         self.step_without_eat_greenfly = step_without_eat_greenfly
         self.reproduction_snail = reproduction_snail
         self.reproduction_greenfly = reproduction_greenfly
+        self.use_preparation_1 = False
+        self.use_preparation_2 = False
+        self.farmer = None
 
         self.schedule = RandomActivation(self)
 
@@ -68,6 +71,7 @@ class Garden(Model):
 
         #Create farmer:
         farmer = Farmer(self.next_id(), self)
+        self.farmer = farmer
         self.schedule.add(farmer)
 
         # Create tomato:
@@ -134,6 +138,7 @@ class Garden(Model):
         self.datacollector.collect(self)
 
     def step(self):
+        self.use_preparation_1, self.use_preparation_2 = self.farmer.use_preparation()
         self.schedule.step()
         # collect data
         self.datacollector.collect(self)

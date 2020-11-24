@@ -173,18 +173,18 @@ class Snail(WalkerAgent):
                 for neighbor in self.model.grid.get_neighborhood(self.pos, True):
                     cell = self.model.grid.get_cell_list_contents([neighbor])
                     salad = [obj for obj in cell if isinstance(obj, Salad)]
-                    tomato = [obj for obj in cell if isinstance(obj, Tomato)]
                     salad_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == "Salad"]
+                    tomato = [obj for obj in cell if isinstance(obj, Tomato)]
                     tomato_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type=="Tomato"]
                     # ślimak w pierwszej kolejności wybiera sałatę
                     if len(salad)>=1:
                         self.model.grid.move_agent(self, neighbor)
                         change_pos = True
+                    elif len(salad_fermon)>=1:
+                        remember_pos = neighbor
                     elif len(tomato)>=1:
                         self.model.grid.move_agent(self, neighbor)
                         change_pos = True
-                    elif len(salad_fermon)>=1:
-                        remember_pos = neighbor
                     elif len(tomato_fermon)>=1:
                         remember_pos = neighbor
 

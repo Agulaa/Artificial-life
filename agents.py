@@ -56,16 +56,16 @@ class FermonAgent(Agent):
         self.pos = pos
 
 
-    def death_fermom_in_cell(self, cell, type):
+    def death_fermom_in_cell(self, new_fermon_cell, type):
         """
         Usunuęcie wszytskich fermonu z planszy z konkretnej pozycji, które wydzielała ta roślina
         :param cell: pozycja fermonu do usunięcia
         :param type: typ fermonu
         """
-        cell = self.model.grid.get_cell_list_contents([cell])
+        cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
         fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
         for f in fermon:
-            self.model.grid._remove_agent(cell, f)
+            self.model.grid._remove_agent(new_fermon_cell, f)
 
     def death(self, type):
         """
@@ -125,6 +125,7 @@ class Tomato(FermonAgent):
         super().__init__(unique_id, pos, model)
         self.pos = pos
         self.eaten_by_greenfly = 5
+        self.step_regeneration = 5
         self.is_weak = False
 
     def step(self):
@@ -133,10 +134,25 @@ class Tomato(FermonAgent):
         """
         if self.model.use_preparation_1 == True:
             if random.uniform(0, 1) < 0.15:
-                self.is_weak = True
+                if self.is_weak==False:
+                    self.is_weak = True
+                    self.model.tomato_weak +=1
         if self.model.use_preparation_2 == True:
             if random.uniform(0, 1) < 0.2:
-                self.is_weak = True
+                if self.is_weak==False:
+                    self.is_weak = True
+                    self.model.tomato_weak += 1
+        # Jeśli jest osłabiona, może się zregenerować po 5 krokach
+        if self.is_weak:
+            self.step_regeneration -=1
+            if self.step_regeneration <=0:
+                self.is_weak=False
+                self.step_regeneration = 5
+                self.model.tomato_weak -= 1
+
+
+
+
 class Salad(FermonAgent):
     """
     Agent sałata, dziedziczy po klasie FermonAgent, nie porusza się, wydziela fermony.
@@ -153,6 +169,7 @@ class Salad(FermonAgent):
         super().__init__(unique_id, pos, model)
         self.pos = pos
         self.eaten_by_snail = 4
+        self.step_regeneration = 5
         self.is_weak = False
 
     def step(self):
@@ -161,10 +178,23 @@ class Salad(FermonAgent):
         """
         if self.model.use_preparation_1 == True:
             if random.uniform(0, 1) < 0.15:
-                self.is_weak = True
+                if self.is_weak == False:
+                    self.is_weak = True
+                    self.model.salad_weak += 1
         if self.model.use_preparation_2 == True:
             if random.uniform(0, 1) < 0.2:
-                self.is_weak = True
+                if self.is_weak==False:
+                    self.is_weak = True
+                    self.model.salad_weak += 1
+        # Jeśli jest osłabiona, może się zregenerować po 5 krokach
+        if self.is_weak:
+            self.step_regeneration -=1
+            if self.step_regeneration <=0:
+                self.is_weak=False
+                self.step_regeneration = 5
+                self.model.salad_weak-=1
+
+
 class Fermon(Agent):
     """
     Agent Fermon, dziedziczy po klasie Agent, nie zmienia swojej pozycji, ma określony typ wydzielania fermonu
@@ -214,7 +244,7 @@ class Snail(WalkerAgent):
         """
         # czy farmer stosuje w tym kroku jakiś preparat
         if self.model.use_preparation_2 == True:
-            print('snail_2')
+            #print('snail_2')
             if random.uniform(0, 1) < 0.8:
                 self.is_alive = False
                 self.model.grid._remove_agent(self.pos, self)
@@ -235,6 +265,7 @@ class Snail(WalkerAgent):
                 if salad[0].is_weak:
                     salad[0].death("Salad")
                     self.model.salad -= 1
+                    self.model.salad_weak-=1
                 else:
                     #Sałata musi być zjedzona przez podaną liczbę ślimaków
                     salad[0].eaten_by_snail-=1
@@ -245,7 +276,9 @@ class Snail(WalkerAgent):
             if len(tomato) > 0:
                 #Ślimak najada się listkami pomidorów i jedynie osłaba pomidory
                 self.step_without_eat = self.model.step_without_eat_snail
-                tomato[0].is_weak = True
+                if tomato[0].is_weak == False:
+                    tomato[0].is_weak = True
+                    self.model.tomato_weak += 1
             else:
                 #jeśli nie było sałaty ani pomidora, to dekrementujemy zmienną step_without_eat
                 self.step_without_eat-=1
@@ -333,7 +366,7 @@ class Greenfly(WalkerAgent):
         """
         # czy farmer stosuje w tym kroku preparat owadobujczy
         if self.model.use_preparation_1 == True:
-            print('greenfly_1')
+            #print('greenfly_1')
             if random.uniform(0, 1) < 0.85:
                 self.is_alive = False
                 self.model.grid._remove_agent(self.pos, self)
@@ -341,7 +374,7 @@ class Greenfly(WalkerAgent):
                 self.model.greenfly -= 1
 
         elif self.model.use_preparation_2 == True:
-            print('greenfly_2')
+            #print('greenfly_2')
             if random.uniform(0, 1) < 0.2:
                 self.is_alive = False
                 self.model.grid._remove_agent(self.pos, self)
@@ -361,6 +394,7 @@ class Greenfly(WalkerAgent):
                 if tomato[0].is_weak:
                     tomato[0].death("Tomato")
                     self.model.tomato-=1
+                    self.model.tomato_weak -=1
                 #Jeśli pomidor nie był osłabiony, to muszą go zaatakować 5 mszyc, więc inkrementujemy wartość dla pomidora
                 else:
                     tomato[0].eaten_by_greenfly-=1

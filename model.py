@@ -41,12 +41,13 @@ class Garden(Model):
         self.preparation_1 = preparation_1
         self.preparation_2 = preparation_2
         self.cell_fermon = cell_fermon
-        self.steps = steps
         self.target_tomato = target_tomato
         self.target_salad = target_salad
         self.tomato = self.initial_tomato
         self.salad = self.initial_salad
         self.greenfly = self.initial_greenfly
+        self.salad_weak = 0
+        self.tomato_weak = 0
         self.snail = self.initial_snail
         self.step_without_eat_snail = step_without_eat_snail
         self.step_without_eat_greenfly = step_without_eat_greenfly
@@ -142,6 +143,9 @@ class Garden(Model):
         self.schedule.step()
         # collect data
         self.datacollector.collect(self)
+        print("Tomato weak", self.tomato_weak)
+        print("Salad weak", self.salad_weak)
+
 
     def put_fermon(self, new_fermon_cell, type):
         new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)

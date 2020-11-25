@@ -237,6 +237,17 @@ class Snail(WalkerAgent):
         self.last_move = None
 
 
+    def death(self):
+        self.is_alive = False
+        self.model.grid._remove_agent(self.pos, self)
+        self.model.schedule.remove(self)
+        self.model.snail -= 1
+
+    def reproduction(self):
+        snail = Snail(self.model.next_id(), self.pos, self.model)
+        self.model.grid.place_agent(snail, self.pos)
+        self.model.schedule.add(snail)
+        self.model.snail += 1
 
     def step(self):
         """
@@ -249,12 +260,8 @@ class Snail(WalkerAgent):
         """
         # czy farmer stosuje w tym kroku jakiś preparat
         if self.model.use_preparation_2 == True:
-            #print('snail_2')
             if random.uniform(0, 1) < 0.8:
-                self.is_alive = False
-                self.model.grid._remove_agent(self.pos, self)
-                self.model.schedule.remove(self)
-                self.model.snail -= 1
+                self.death()
 
         # czy owad zginął od środków owadobujczyć
         if self.is_alive == True:
@@ -327,20 +334,15 @@ class Snail(WalkerAgent):
 
             #Death - jeśli ślimak nie pożywił się to umiera
             else:
-                self.is_alive = False
-                self.model.grid._remove_agent(self.pos, self)
-                self.model.schedule.remove(self)
-                self.model.snail-=1
+                self.death()
+
 
         # jeśli owad nie umarł z głodu ani od środków owadobujczych to sprawdzenie czy się rozmanaża
         if self.is_alive == True:
             # Reproduction - wiem że powinno to być wyżej bo tu już ten owad może nie żyć ale z jakegoś powodu to nie działało, będę próbować
             self.reproduction_snail -= 1
             if self.reproduction_snail == 0 and random.uniform(0, 1) < 0.5:
-                snail = Snail(self.model.next_id(), self.pos, self.model)
-                self.model.grid.place_agent(snail, self.pos)
-                self.model.schedule.add(snail)
-                self.model.snail+=1
+                self.reproduction()
 
             if self.reproduction_snail == 0:
                 self.reproduction_snail = self.model.reproduction_snail
@@ -368,6 +370,18 @@ class Greenfly(WalkerAgent):
         self.is_alive = True
         self.last_move = None
 
+    def death(self):
+        self.is_alive = False
+        self.model.grid._remove_agent(self.pos, self)
+        self.model.schedule.remove(self)
+        self.model.greenfly -= 1
+
+    def reproduction(self):
+        greenfly = Greenfly(self.model.next_id(), self.pos, self.model)
+        self.model.grid.place_agent(greenfly, self.pos)
+        self.model.schedule.add(greenfly)
+        self.model.greenfly += 1
+
     def step(self):
         """
         Metoda wykonywana podczas ruchu ślimaka.
@@ -382,18 +396,12 @@ class Greenfly(WalkerAgent):
         if self.model.use_preparation_1 == True:
             #print('greenfly_1')
             if random.uniform(0, 1) < 0.85:
-                self.is_alive = False
-                self.model.grid._remove_agent(self.pos, self)
-                self.model.schedule.remove(self)
-                self.model.greenfly -= 1
+                self.death()
 
         elif self.model.use_preparation_2 == True:
             #print('greenfly_2')
             if random.uniform(0, 1) < 0.2:
-                self.is_alive = False
-                self.model.grid._remove_agent(self.pos, self)
-                self.model.schedule.remove(self)
-                self.model.greenfly -= 1
+                self.death()
 
         #czy owad zginął od środków owadobujczyć
         if self.is_alive == True:
@@ -447,24 +455,17 @@ class Greenfly(WalkerAgent):
 
             #Death - jeśli mszyca nie jest najedzona - umiera
             else:
-                self.is_alive = False
-                self.model.grid._remove_agent(self.pos, self)
-                self.model.schedule.remove(self)
-                self.model.greenfly -= 1
+                self.death()
 
         #jeśli owad nie umarł z głodu ani od środków owadobujczych to sprawdzenie czy się rozmanaża
         if self.is_alive == True:
-            # Reproduction - wiem że powinno to być wyżej bo tu już ten owad może nie żyć ale z jakegoś powodu to nie działało, będę próbować
             self.reproduction_greenfly -= 1
             if self.reproduction_greenfly == 0 and random.uniform(0, 1) < 0.5:
-                greenfly = Greenfly(self.model.next_id(), self.pos, self.model)
-
-                self.model.grid.place_agent(greenfly, self.pos)
-                self.model.schedule.add(greenfly)
-                self.model.greenfly += 1
+                self.reproduction()
 
             if self.reproduction_greenfly == 0:
                 self.reproduction_greenfly = self.model.reproduction_greenfly
+
 class Farmer(Agent):
     """
     Agent Farmer, dziedziczy po klasie Agent, nie porusza się,

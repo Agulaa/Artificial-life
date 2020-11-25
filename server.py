@@ -80,7 +80,7 @@ model_params = {
         "slider", "Initial Snail Population", 1, 0, 50
     ),
     "step_without_eat_snail": UserSettableParameter(
-        "slider", "Steps without eat for Snail",1, 1, 30
+        "slider", "Steps without eat for Snail",3, 1, 30
     ),
     "initial_greenfly": UserSettableParameter(
         "slider", "Initial Greenfly Population", 1, 0, 50
@@ -89,10 +89,10 @@ model_params = {
         "slider", "Steps without eat for Greenfly", 3, 1, 30
     ),
     "reproduction_snail": UserSettableParameter(
-        "slider", "Reproduction steps for Snail",1, 1, 30
+        "slider", "Reproduction steps for Snail",3, 1, 30
     ),
     "reproduction_greenfly": UserSettableParameter(
-        "slider", "Reproduction steps for Greenfly",1, 1, 30
+        "slider", "Reproduction steps for Greenfly",3, 1, 30
     ),
     "preparation_1": UserSettableParameter(
         "slider", "Preparation_1", 0, 0, 20

@@ -103,9 +103,6 @@ model_params = {
     "cell_fermon": UserSettableParameter(
         "slider", "Fermon", 1, 1, 10
     ),
-    "steps": UserSettableParameter(
-        "slider", "Steps", 20, 1, 50
-    ),
     "target_tomato": UserSettableParameter(
         "slider", "Target Tomato", 20, 1, 50
     ),

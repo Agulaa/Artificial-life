@@ -2,16 +2,32 @@ from mesa import Agent
 import numpy as np
 import random
 
-
 class WalkerAgent(Agent):
+    """
+  Klasa agenta, która dziedziczy po klasie Agent.
+  Została w niej zaimplementowana metoda,
+  z której będą korzystać agenci, którzy będą się poruszać na planszy.
+    """
 
     def __init__(self, unique_id, pos, model, moore):
+        """
+        :param unique_id: unikalne id dla agenta
+        :param pos: pozycja na planszy
+        :param model: model
+        :param moore: wartość True/False, oznaczająca czy agent będzie poruszał się zgodne z sąsiedztwem moore czy nie
+        """
         super().__init__(unique_id, model)
         self.pos = pos
         self.moore = moore
 
     def random_move(self):
+        """
+        Jeśli agent będzie poruszał się zgodnie z sąsiedztwem moore, to następny krok jest w obrębie jego sąsiedzta
+        Jeśli natomiast agent, nie będzie poruszał sie zgodnie z sąsiedztewem moore, to następny krok jest losowy.
+        :return:
+        """
         if self.moore:
+
             next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
             next_move = self.random.choice(next_moves)
             self.model.grid.move_agent(self, next_move)
@@ -25,21 +41,42 @@ class WalkerAgent(Agent):
                 next_x = self.random.choice(canditate_x)
                 next_y = self.random.choice(canditate_y)
             self.model.grid.move_agent(self, (next_x, next_y))
-
 class FermonAgent(Agent):
+    """
+    Dziedziczy po klasie Agent, jest to klasa, która nie porusza, wydziela fermony, na zadaną ilość kratek
+
+    """
     def __init__(self, unique_id, pos, model):
+        """
+        :param unique_id: unikalne id
+        :param pos: pozycja na planszy
+        :param model: model
+        """
         super().__init__(unique_id, model)
         self.pos = pos
 
-    def death_fermom_in_cell(self, new_fermon_cell, type):
-        cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
+
+    def death_fermom_in_cell(self, cell, type):
+        """
+        Usunuęcie wszytskich fermonu z planszy z konkretnej pozycji, które wydzielała ta roślina
+        :param cell: pozycja fermonu do usunięcia
+        :param type: typ fermonu
+        """
+        cell = self.model.grid.get_cell_list_contents([cell])
         fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
         for f in fermon:
-            self.model.grid._remove_agent(new_fermon_cell, f)
+            self.model.grid._remove_agent(cell, f)
 
     def death(self, type):
+        """
+        Metoda uruchamiana jest gdy zostaje usunięta z planszy roślina.
+        Metoda ta usuwa z planszy wszytskie fermony, które wydzielała ta roślina
+        :param type: typ fermonu
+        """
+        # Pobranie pozycji rośliny
         x = self.pos[0]
         y = self.pos[1]
+        # W zależności od intensywności fermonów,usuwane są wszytskie, które były w obrębie tej rośliny wydzielane
         for i in range(0, self.model.cell_fermon + 1):
             if x + i < self.model.width and y + i < self.model.height:
                 new_fermon_cell = (x + i, y + i)
@@ -69,52 +106,96 @@ class FermonAgent(Agent):
                 new_fermon_cell = (x - i, y)
                 self.death_fermom_in_cell(new_fermon_cell, type)
 
+        # Po usunięciu fermonów, które wydzielała roślina, usuwane jest sama ona
         self.model.grid._remove_agent(self.pos, self)
         self.model.schedule.remove(self)
-
 class Tomato(FermonAgent):
+    """
+    Agent pomiodr, dziedziczy po klasie FermonAgent, nie porusza się, wydziela fermony.
+    Może zostać osłabiony przez preparat lub zwierzę.
+    """
 
     def __init__(self, unique_id, pos, model):
+        """
+        :param unique_id: unikalne id
+        :param pos: pozycja na planszy
+        :param model: model
+        is_weak: Czy ageny jest osłabiony
+        """
         super().__init__(unique_id, pos, model)
         self.pos = pos
         self.eaten_by_greenfly = 5
         self.is_weak = False
 
     def step(self):
+        """
+        Podczas metody step, agent się nie zmiena pozycji, może zostać jedynie osłabiony przez preparaty
+        """
         if self.model.use_preparation_1 == True:
             if random.uniform(0, 1) < 0.15:
                 self.is_weak = True
         if self.model.use_preparation_2 == True:
             if random.uniform(0, 1) < 0.2:
                 self.is_weak = True
-
 class Salad(FermonAgent):
+    """
+    Agent sałata, dziedziczy po klasie FermonAgent, nie porusza się, wydziela fermony.
+    Może zostać osłabiony przez preparat lub zwierzę.
+    """
 
     def __init__(self, unique_id, pos, model):
+        """
+      :param unique_id: unikalne id
+      :param pos: pozycja na planszy
+      :param model: model
+      is_weak: Czy ageny jest osłabiony
+        """
         super().__init__(unique_id, pos, model)
         self.pos = pos
         self.eaten_by_snail = 4
         self.is_weak = False
 
     def step(self):
+        """
+         Podczas metody step, agent się nie zmiena pozycji, może zostać jedynie osłabiony przez preparaty
+        """
         if self.model.use_preparation_1 == True:
             if random.uniform(0, 1) < 0.15:
                 self.is_weak = True
         if self.model.use_preparation_2 == True:
             if random.uniform(0, 1) < 0.2:
                 self.is_weak = True
-
 class Fermon(Agent):
+    """
+    Agent Fermon, dziedziczy po klasie Agent, nie zmienia swojej pozycji, ma określony typ wydzielania fermonu
+    """
 
     def __init__(self, unique_id, pos, model, type):
+        """
+        :param unique_id: unikalne id
+        :param pos: pozycja na planszy
+        :param model: model
+        :param type: typ fermonu
+        """
         super().__init__(unique_id, model)
         self.pos = pos
         self.type = type
-
-
 class Snail(WalkerAgent):
+    """
+    Agent ślimak, dziedziczy po klasie WalkerAgent, porusza się zgodnie ze sąsiedztwem Moora.
+    """
 
     def __init__(self, unique_id, pos, model, moore=True):
+        """
+        self.step_without_eat - ilość korków bez jedzenia, która jest ustawiana przez użytwkownika
+        self.reproduction_snail - wielkość reprodukcji, która jest ustawiana przez użytwkownika
+        self.is_alive - zmienna boolowska, która informuje, czy ślimak żyje
+
+        :param unique_id: unikalne id
+        :param pos: pozycja na planszy
+        :param model: model
+        :param moore: czy porusza się zgodznie z sąsiedztwem moore'a
+        """
         super().__init__(unique_id, pos, model, moore)
         self.step_without_eat = self.model.step_without_eat_snail
         self.reproduction_snail = self.model.reproduction_snail
@@ -123,7 +204,14 @@ class Snail(WalkerAgent):
 
 
     def step(self):
-
+        """
+        Metoda wykonywana podczas ruchu ślimaka.
+        1) sprawdzenie czy zastosowane zostały preparaty przez rolnika
+        2) sprawdzenie czy środek nie zabił ślimaka
+        3) sprawdzenie, co znajduje się na pozycji - jeśli jest pożywienie, ślimak je zjada
+        4) jeśli ślimak jest najedzony, wykonuje krok; jeśli się nie najadł to umiera
+        5) jeśli owad nie umarł z głodu ani od środków owadobujczych to sprawdzenie czy się rozmanaża
+        """
         # czy farmer stosuje w tym kroku jakiś preparat
         if self.model.use_preparation_2 == True:
             print('snail_2')
@@ -158,7 +246,6 @@ class Snail(WalkerAgent):
                 #Ślimak najada się listkami pomidorów i jedynie osłaba pomidory
                 self.step_without_eat = self.model.step_without_eat_snail
                 tomato[0].is_weak = True
-
             else:
                 #jeśli nie było sałaty ani pomidora, to dekrementujemy zmienną step_without_eat
                 self.step_without_eat-=1
@@ -213,18 +300,37 @@ class Snail(WalkerAgent):
 
             if self.reproduction_snail == 0:
                 self.reproduction_snail = self.model.reproduction_snail
-
-
 class Greenfly(WalkerAgent):
+    """
+    Dziedziczy po klasie WalkerAgent, porusza się losowo w kierunku wydzielanych fermonów
+    """
 
     def __init__(self, unique_id, pos, model, moore=False):
+        """
+        self.step_without_eat - ilość korków bez jedzenia, która jest ustawiana przez użytwkownika
+        self.reproduction_greenfly - wielkość reprodukcji, która jest ustawiana przez użytwkownika
+        self.is_alive - zmienna boolowska, która informuje, czy mszyca żyje
+
+        :param unique_id: unikalne id
+        :param pos: pozycja na planszy
+        :param model: model
+        :param moore: czy porusza się zgodznie z sąsiedztwem moore'a
+        """
         super().__init__(unique_id, pos, model, moore=moore)
         self.step_without_eat = self.model.step_without_eat_greenfly
         self.reproduction_greenfly = self.model.reproduction_greenfly
         self.is_alive = True
 
     def step(self):
+        """
+        Metoda wykonywana podczas ruchu ślimaka.
+        1) sprawdzenie czy zastosowane zostały preparaty przez rolnika
+        2) sprawdzenie czy środek nie zabił ślimaka
+        3) sprawdzenie, co znajduje się na pozycji - jeśli jest pożywienie, ślimak je zjada
+        4) jeśli ślimak jest najedzony, wykonuje krok; jeśli się nie najadł to umiera
+        5) jeśli owad nie umarł z głodu ani od środków owadobujczych to sprawdzenie czy się rozmanaża
 
+        """
         # czy farmer stosuje w tym kroku preparat owadobujczy
         if self.model.use_preparation_1 == True:
             print('greenfly_1')
@@ -308,13 +414,18 @@ class Greenfly(WalkerAgent):
 
             if self.reproduction_greenfly == 0:
                 self.reproduction_greenfly = self.model.reproduction_greenfly
-
-
-
-
-
 class Farmer(Agent):
+    """
+    Agent Farmer, dziedziczy po klasie Agent, nie porusza się,
+    w każdym kroku może zastosować preparaty, które mają na celu zniwelować szkodliwe owady
+    """
     def __init__(self, unique_id, model):
+        """
+        self.dose_preparation_1 - ilość parametru pierwszego
+        self.dose_preparation_2 - ilość parametru drugiego
+        :param unique_id: unikalne id
+        :param model: model
+        """
         super().__init__(unique_id, model)
         self.dose_preparation_1 = self.model.preparation_1
         self.dose_preparation_2 = self.model.preparation_2

@@ -44,7 +44,7 @@ class WalkerAgent(Agent):
             self.model.grid.move_agent(self, (next_x, next_y))
             return (next_x, next_y)
 
-class FermonAgent(Agent):
+class PlantAgent(Agent):
     """
     Dziedziczy po klasie Agent, jest to klasa, która nie porusza, wydziela fermony, na zadaną ilość kratek
 
@@ -112,9 +112,9 @@ class FermonAgent(Agent):
         # Po usunięciu fermonów, które wydzielała roślina, usuwane jest sama ona
         self.model.grid._remove_agent(self.pos, self)
         self.model.schedule.remove(self)
-class Tomato(FermonAgent):
+class Tomato(PlantAgent):
     """
-    Agent pomiodr, dziedziczy po klasie FermonAgent, nie porusza się, wydziela fermony.
+    Agent pomiodr, dziedziczy po klasie PlantAgent, nie porusza się, wydziela fermony.
     Może zostać osłabiony przez preparat lub zwierzę.
     """
 
@@ -156,9 +156,9 @@ class Tomato(FermonAgent):
 
 
 
-class Salad(FermonAgent):
+class Salad(PlantAgent):
     """
-    Agent sałata, dziedziczy po klasie FermonAgent, nie porusza się, wydziela fermony.
+    Agent sałata, dziedziczy po klasie PlantAgent, nie porusza się, wydziela fermony.
     Może zostać osłabiony przez preparat lub zwierzę.
     """
 

@@ -143,8 +143,7 @@ class Garden(Model):
         self.schedule.step()
         # collect data
         self.datacollector.collect(self)
-        print("Tomato weak", self.tomato_weak)
-        print("Salad weak", self.salad_weak)
+
 
 
     def put_fermon(self, new_fermon_cell, type):

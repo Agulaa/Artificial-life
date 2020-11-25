@@ -77,37 +77,37 @@ model_params = {
         "slider", "Initial Salad Population", 1, 1, 50
     ),
     "initial_snail": UserSettableParameter(
-        "slider", "Initial Snail Population", 0, 0, 50
+        "slider", "Initial Snail Population", 1, 0, 50
     ),
     "step_without_eat_snail": UserSettableParameter(
-        "slider", "Steps without eat for Snail",1, 1, 50
+        "slider", "Steps without eat for Snail",1, 1, 30
     ),
     "initial_greenfly": UserSettableParameter(
-        "slider", "Initial Greenfly Population", 0, 0, 50
+        "slider", "Initial Greenfly Population", 1, 0, 50
     ),
     "step_without_eat_greenfly": UserSettableParameter(
-        "slider", "Steps without eat for Greenfly", 1, 1, 50
+        "slider", "Steps without eat for Greenfly", 3, 1, 30
     ),
     "reproduction_snail": UserSettableParameter(
-        "slider", "Reproduction steps for Snail",0, 0, 50
+        "slider", "Reproduction steps for Snail",1, 1, 30
     ),
     "reproduction_greenfly": UserSettableParameter(
-        "slider", "Reproduction steps for Greenfly",0, 0, 50
+        "slider", "Reproduction steps for Greenfly",1, 1, 30
     ),
     "preparation_1": UserSettableParameter(
-        "slider", "Preparation_1", 10, 0, 20
+        "slider", "Preparation_1", 0, 0, 20
     ),
     "preparation_2": UserSettableParameter(
-        "slider", "Preparation_2", 10, 0, 20
+        "slider", "Preparation_2", 0, 0, 20
     ),
     "cell_fermon": UserSettableParameter(
-        "slider", "Fermon", 1, 1, 10
+        "slider", "Fermon", 1, 1, 5
     ),
     "target_tomato": UserSettableParameter(
-        "slider", "Target Tomato", 20, 1, 50
+        "slider", "Target Tomato", 1, 1, 50
     ),
     "target_salad": UserSettableParameter(
-            "slider", "Target Salad", 20, 1, 50
+            "slider", "Target Salad", 1, 1, 50
         )
 
 }

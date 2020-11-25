@@ -31,6 +31,7 @@ class WalkerAgent(Agent):
             next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
             next_move = self.random.choice(next_moves)
             self.model.grid.move_agent(self, next_move)
+            return next_move
         else:
             x,y = self.pos
             canditate_x = np.arange(self.model.grid.width)
@@ -41,6 +42,8 @@ class WalkerAgent(Agent):
                 next_x = self.random.choice(canditate_x)
                 next_y = self.random.choice(canditate_y)
             self.model.grid.move_agent(self, (next_x, next_y))
+            return (next_x, next_y)
+
 class FermonAgent(Agent):
     """
     Dziedziczy po klasie Agent, jest to klasa, która nie porusza, wydziela fermony, na zadaną ilość kratek
@@ -210,6 +213,7 @@ class Fermon(Agent):
         super().__init__(unique_id, model)
         self.pos = pos
         self.type = type
+
 class Snail(WalkerAgent):
     """
     Agent ślimak, dziedziczy po klasie WalkerAgent, porusza się zgodnie ze sąsiedztwem Moora.
@@ -230,6 +234,7 @@ class Snail(WalkerAgent):
         self.step_without_eat = self.model.step_without_eat_snail
         self.reproduction_snail = self.model.reproduction_snail
         self.is_alive = True
+        self.last_move = None
 
 
 
@@ -291,28 +296,34 @@ class Snail(WalkerAgent):
             if self.step_without_eat >= 1:
                 #sprawdzamy po sąsiadach czy jest fermon, sałata lub pomidor
                 for neighbor in self.model.grid.get_neighborhood(self.pos, True):
-                    cell = self.model.grid.get_cell_list_contents([neighbor])
-                    salad = [obj for obj in cell if isinstance(obj, Salad)]
-                    salad_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == "Salad"]
-                    tomato = [obj for obj in cell if isinstance(obj, Tomato)]
-                    tomato_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type=="Tomato"]
-                    # ślimak w pierwszej kolejności wybiera sałatę
-                    if len(salad)>=1:
-                        self.model.grid.move_agent(self, neighbor)
-                        change_pos = True
-                    elif len(salad_fermon)>=1:
-                        remember_pos = neighbor
-                    elif len(tomato)>=1:
-                        self.model.grid.move_agent(self, neighbor)
-                        change_pos = True
-                    elif len(tomato_fermon)>=1:
-                        remember_pos = neighbor
+                    # blokada ruchu poprzedniego - zapobiega zablokowaniu się
+                    if neighbor != self.last_move:
+                        cell = self.model.grid.get_cell_list_contents([neighbor])
+                        salad = [obj for obj in cell if isinstance(obj, Salad)]
+                        salad_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == "Salad"]
+                        tomato = [obj for obj in cell if isinstance(obj, Tomato)]
+                        tomato_fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type=="Tomato"]
+                        # ślimak w pierwszej kolejności wybiera sałatę
+                        if len(salad)>=1:
+                            self.model.grid.move_agent(self, neighbor)
+                            self.last_move = neighbor
+                            change_pos = True
+                        elif len(salad_fermon)>=1:
+                            remember_pos = neighbor
+                        elif len(tomato)>=1:
+                            self.model.grid.move_agent(self, neighbor)
+                            self.last_move = neighbor
+                            change_pos = True
+                        elif len(tomato_fermon)>=1:
+                            remember_pos = neighbor
 
                 if not change_pos and remember_pos:
                     self.model.grid.move_agent(self, remember_pos)
+                    self.last_move = neighbor
                     change_pos = True
                 if not change_pos:
-                    self.random_move()
+                    move = self.random_move()
+                    self.last_move = move
 
             #Death - jeśli ślimak nie pożywił się to umiera
             else:
@@ -333,6 +344,8 @@ class Snail(WalkerAgent):
 
             if self.reproduction_snail == 0:
                 self.reproduction_snail = self.model.reproduction_snail
+
+
 class Greenfly(WalkerAgent):
     """
     Dziedziczy po klasie WalkerAgent, porusza się losowo w kierunku wydzielanych fermonów
@@ -353,6 +366,7 @@ class Greenfly(WalkerAgent):
         self.step_without_eat = self.model.step_without_eat_greenfly
         self.reproduction_greenfly = self.model.reproduction_greenfly
         self.is_alive = True
+        self.last_move = None
 
     def step(self):
         """
@@ -411,22 +425,25 @@ class Greenfly(WalkerAgent):
             # Kolejny krok jest zależy od tego, czy w sąsiedztwie jest fermon pomidora lub sam pomidor
             if self.step_without_eat>=1:
                 for neighbor in self.model.grid.get_neighborhood(self.pos, True):
-                    cell = self.model.grid.get_cell_list_contents([neighbor])
-                    tomato = [obj for obj in cell if isinstance(obj, Tomato)]
-                    fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type=="Tomato"]
-                    if len(tomato)>=1:
-                        self.model.grid.move_agent(self, neighbor)
-                        change_pos = True
-                    elif len(fermon) >= 1:
-                        remember_pos = neighbor
-                        #self.model.grid.move_agent(self, neighbor)
-                        #change_pos = True
+                    if neighbor != self.last_move:
+                        cell = self.model.grid.get_cell_list_contents([neighbor])
+                        tomato = [obj for obj in cell if isinstance(obj, Tomato)]
+                        fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type=="Tomato"]
+                        if len(tomato)>=1:
+                            self.model.grid.move_agent(self, neighbor)
+                            change_pos = True
+                            self.last_move = neighbor
+                        elif len(fermon) >= 1:
+                            remember_pos = neighbor
+
                 if not change_pos and remember_pos:
                     self.model.grid.move_agent(self, remember_pos)
                     change_pos = True
+                    self.last_move = remember_pos
 
                 if not change_pos:
-                    self.random_move()
+                    move = self.random_move()
+                    self.last_move = move
 
             #Death - jeśli mszyca nie jest najedzona - umiera
             else:
@@ -468,10 +485,11 @@ class Farmer(Agent):
         self.use_preparation_1 = False
         self.use_preparation_2 = False
 
-#(todo programowowanie ilorazowe??)
 
         # jeśli mamy dawki preparatu i jeśli brakuje roślin
-        if (self.dose_preparation_1 > 0 or self.dose_preparation_2 > 0) and (self.model.target_tomato > self.model.tomato or self.model.target_salad > self.model.salad):
+        tomato = self.model.tomato - self.model.tomato_weak
+        salad = self.model.salad - self.model.salad_weak
+        if (self.dose_preparation_1 > 0 or self.dose_preparation_2 > 0) and (self.model.target_tomato > tomato or self.model.target_salad > salad):
 
             # ile owadów zostanie po zastosowaniu każdego preparatu - chcemy minimalizować
             insects1 = 0.15 * self.model.greenfly + self.model.snail

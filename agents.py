@@ -67,7 +67,8 @@ class PlantAgent(Agent):
         cell = self.model.grid.get_cell_list_contents([new_fermon_cell])
         fermon = [obj for obj in cell if isinstance(obj, Fermon) and obj.type == type]
         for f in fermon:
-            self.model.grid._remove_agent(new_fermon_cell, f)
+            if f.plant_id == self.unique_id:
+                self.model.grid._remove_agent(new_fermon_cell, f)
 
     def death(self, type):
         """
@@ -92,19 +93,16 @@ class PlantAgent(Agent):
             if x + i < self.model.width and y - i >= 0:
                 new_fermon_cell = (x + i, y - i)
                 self.death_fermom_in_cell(new_fermon_cell, type)
-            if x + (i - 1) < self.model.width and y - i >= 0:
-                new_fermon_cell = (x, y - i)
-                self.death_fermom_in_cell(new_fermon_cell, type)
-            if x and y + i < self.model.height:
+            if y + i < self.model.height:
                 new_fermon_cell = (x, y + i)
                 self.death_fermom_in_cell(new_fermon_cell, type)
-            if x and y - i >= 0:
+            if y - i >= 0:
                 new_fermon_cell = (x, y - i)
                 self.death_fermom_in_cell(new_fermon_cell, type)
-            if x + i < self.model.width and y:
+            if x + i < self.model.width :
                 new_fermon_cell = (x + i, y)
                 self.death_fermom_in_cell(new_fermon_cell, type)
-            if x - i >= 0 and y:
+            if x - i >= 0 :
                 new_fermon_cell = (x - i, y)
                 self.death_fermom_in_cell(new_fermon_cell, type)
 
@@ -196,7 +194,7 @@ class Fermon(Agent):
     Agent Fermon, dziedziczy po klasie Agent, nie zmienia swojej pozycji, ma określony typ wydzielania fermonu
     """
 
-    def __init__(self, unique_id, pos, model, type):
+    def __init__(self, unique_id, pos, model, type, plant_id):
         """
         :param unique_id: unikalne id
         :param pos: pozycja na planszy
@@ -206,6 +204,7 @@ class Fermon(Agent):
         super().__init__(unique_id, model)
         self.pos = pos
         self.type = type
+        self.plant_id = plant_id
 class Snail(WalkerAgent):
     """
     Agent ślimak, dziedziczy po klasie WalkerAgent, porusza się zgodnie ze sąsiedztwem Moora.

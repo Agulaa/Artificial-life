@@ -149,39 +149,49 @@ class Garden(Model):
 
 
 
-    def put_fermon(self, new_fermon_cell, type):
-        new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type)
+    def put_fermon(self, new_fermon_cell, type, plant_unique_id):
+        new_fermon = Fermon(self.next_id(), new_fermon_cell, self, type, plant_unique_id)
         self.grid.place_agent(new_fermon, new_fermon_cell)
 
 
-    def put_all_fermon(self, position, type):
-        for i in range(0, self.cell_fermon + 1):
-            x = position.pos[0]
-            y = position.pos[1]
+    def put_all_fermon(self, plant, type):
+        x = plant.pos[0]
+        y = plant.pos[1]
+        print(x, y)
+        for i in range(1, self.cell_fermon + 1):
+            print(i)
             if x + i < self.width and y + i < self.height:
                 new_fermon_cell = (x + i, y + i)
-                self.put_fermon(new_fermon_cell, type)
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
             if x - i >= 0 and y + i < self.height:
                 new_fermon_cell = (x - i, y + i)
-                self.put_fermon(new_fermon_cell, type)
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
             if x - i >= 0 and y - i >= 0:
                 new_fermon_cell = (x - i, y - i)
-                self.put_fermon(new_fermon_cell, type)
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
             if x + i < self.width and y - i >= 0:
                 new_fermon_cell = (x + i, y - i)
-                self.put_fermon(new_fermon_cell, type)
-            if x+(i-1)<self.width and y - i >= 0:
-                new_fermon_cell = (x, y - i)
-                self.put_fermon(new_fermon_cell, type)
-            if x  and y + i <  self.height:
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
+
+            if  y + i <  self.height:
                 new_fermon_cell = (x, y + i)
-                self.put_fermon(new_fermon_cell, type)
-            if x and y - i >= 0:
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
+            if  y - i >= 0:
                 new_fermon_cell = (x, y - i)
-                self.put_fermon(new_fermon_cell, type)
-            if x + i < self.width and y:
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
+
+            if x + i < self.width :
                 new_fermon_cell = (x + i, y)
-                self.put_fermon(new_fermon_cell, type)
-            if x - i >= 0 and y:
-                new_fermon_cell = (x - i, y)
-                self.put_fermon(new_fermon_cell, type)
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
+            if x-i>=0 :
+                new_fermon_cell = (x-i, y)
+                self.put_fermon(new_fermon_cell, type, plant.unique_id)
+
+

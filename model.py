@@ -159,7 +159,6 @@ class Garden(Model):
         y = plant.pos[1]
        
         for i in range(1, self.cell_fermon + 1):
-            print(i)
             if x + i < self.width and y + i < self.height:
                 new_fermon_cell = (x + i, y + i)
                 self.put_fermon(new_fermon_cell, type, plant.unique_id)

@@ -20,13 +20,14 @@ class Garden(Model):
         preparation_1 = 10,
         preparation_2=10,
         cell_fermon = 1,
-        steps = 5,
         target_tomato=20,
         target_salad=20,
         step_without_eat_snail = 10,
         step_without_eat_greenfly=10,
         reproduction_snail = 10,
-        reproduction_greenfly = 10
+        reproduction_greenfly = 10,
+        recovery_salad = 3,
+        recovery_tomato = 3
 
     ):
 
@@ -53,6 +54,8 @@ class Garden(Model):
         self.step_without_eat_greenfly = step_without_eat_greenfly
         self.reproduction_snail = reproduction_snail
         self.reproduction_greenfly = reproduction_greenfly
+        self.recovery_salad = recovery_salad
+        self.recovery_tomato = recovery_tomato
         self.use_preparation_1 = False
         self.use_preparation_2 = False
         self.farmer = None

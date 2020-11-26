@@ -127,7 +127,7 @@ class Tomato(PlantAgent):
         super().__init__(unique_id, pos, model)
         self.pos = pos
         self.eaten_by_greenfly = 5
-        self.step_regeneration = 5
+        self.step_regeneration = self.model.recovery_tomato
         self.is_weak = False
 
     def step(self):
@@ -167,7 +167,7 @@ class Salad(PlantAgent):
         super().__init__(unique_id, pos, model)
         self.pos = pos
         self.eaten_by_snail = 4
-        self.step_regeneration = 5
+        self.step_regeneration = self.model.recovery_salad
         self.is_weak = False
 
     def step(self):
@@ -391,12 +391,10 @@ class Greenfly(WalkerAgent):
         """
         # czy farmer stosuje w tym kroku preparat owadobujczy
         if self.model.use_preparation_1 == True:
-            #print('greenfly_1')
             if random.uniform(0, 1) < 0.85:
                 self.death()
 
         elif self.model.use_preparation_2 == True:
-            #print('greenfly_2')
             if random.uniform(0, 1) < 0.2:
                 self.death()
 

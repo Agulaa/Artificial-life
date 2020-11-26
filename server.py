@@ -15,7 +15,8 @@ class VegetablesElement(TextElement):
 
     def render(self, model):
 
-        return "Tomatoes: " + str(model.tomato) +"  Salads: " + str(model.salad) + "  Snail: " + str(model.snail) + "  Greenfly: "+ str(model.greenfly)
+        return "Tomatoes: " + str(model.tomato) +"  Salads: " + str(model.salad) + "  Snail: " + str(model.snail) + "  Greenfly: "+ str(model.greenfly)  + "  Preparation1: " \
+               + str(model.preparation_1) + " Preparation2: " + str(model.preparation_2)
 
 
 def garden_portrayal(agent):
@@ -79,17 +80,23 @@ model_params = {
     "initial_snail": UserSettableParameter(
         "slider", "Initial Snail Population", 1, 0, 50
     ),
-    "step_without_eat_snail": UserSettableParameter(
-        "slider", "Steps without eat for Snail",3, 1, 30
-    ),
     "initial_greenfly": UserSettableParameter(
         "slider", "Initial Greenfly Population", 1, 0, 50
+    ),
+    "step_without_eat_snail": UserSettableParameter(
+        "slider", "Steps without eat for Snail",3, 1, 30
     ),
     "step_without_eat_greenfly": UserSettableParameter(
         "slider", "Steps without eat for Greenfly", 3, 1, 30
     ),
     "reproduction_snail": UserSettableParameter(
         "slider", "Reproduction steps for Snail",3, 1, 30
+    ),
+    "recovery_salad": UserSettableParameter(
+        "slider", "Recovery steps for Salad", 3, 1, 30
+    ),
+    "recovery_tomato": UserSettableParameter(
+        "slider", "Recovery steps for Tomato", 3, 1, 30
     ),
     "reproduction_greenfly": UserSettableParameter(
         "slider", "Reproduction steps for Greenfly",3, 1, 30

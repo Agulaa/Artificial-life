@@ -483,9 +483,7 @@ class Farmer(Agent):
 
 
         # jeśli mamy dawki preparatu i jeśli brakuje roślin
-        tomato = self.model.tomato - self.model.tomato_weak
-        salad = self.model.salad - self.model.salad_weak
-        if (self.dose_preparation_1 > 0 or self.dose_preparation_2 > 0) and (self.model.target_tomato > tomato or self.model.target_salad > salad):
+        if (self.dose_preparation_1 > 0 or self.dose_preparation_2 > 0) and (self.model.greenfly > self.model.tomato or self.model.snail >= self.model.tomato + self.model.salad):
 
             # ile owadów zostanie po zastosowaniu każdego preparatu - chcemy minimalizować
             insects1 = 0.15 * self.model.greenfly + self.model.snail
@@ -498,9 +496,11 @@ class Farmer(Agent):
             if insects1 + plants1 < insects2 + plants2:
                 if self.dose_preparation_1 > 0:
                     self.use_preparation_1 = True
+                    self.dose_preparation_1 -= 1
             else:
                 if self.dose_preparation_2 > 0:
                     self.use_preparation_2 = True
+                    self.dose_preparation_2 -= 1
 
 
         return self.use_preparation_1, self.use_preparation_2

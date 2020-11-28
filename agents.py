@@ -491,7 +491,8 @@ class Farmer(Agent):
             plants1 = max(0, self.model.target_salad - 0.85 * self.model.salad) + max(0, self.model.target_tomato - 0.85 * self.model.tomato)
             plants2 = max(0, self.model.target_salad - 0.8 * self.model.salad) + max(0, self.model.target_tomato - 0.8 * self.model.tomato)
 
-            if insects1 + plants1 < insects2 + plants2:
+            if 0.4 * insects1 + 0.6 * plants1 < 0.4 * insects2 + 0.6 * plants2:
+            # if insects1 + plants1 < insects2 + plants2:
                 if self.dose_preparation_1 > 0:
                     self.use_preparation_1 = True
                     self.dose_preparation_1 -= 1
